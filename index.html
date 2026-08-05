@@ -4,166 +4,188 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AUX-OFF Vol. 2 — Team Peak vs Team Prime</title>
+<link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Baloo+2:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --peak:#3b82f6;
-    --peak-dark:#1d4ed8;
-    --prime:#f97316;
-    --prime-dark:#c2410c;
-    --bg1:#0f172a;
-    --bg2:#1e1b4b;
-    --card:#ffffff;
-    --ink:#0f172a;
-    --muted:#64748b;
+    --peak:#2f8fe0;
+    --peak-dark:#1c5fb0;
+    --prime:#ff3fa6;
+    --prime-dark:#c21c78;
+    --ufo-green:#9fe032;
+    --atomic-purple:#7a4fe0;
+    --bg:#cabdec;
+    --card:#fdfbff;
+    --ink:#2b2140;
+    --muted:#8a7fa8;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     min-height:100vh;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:linear-gradient(135deg,var(--bg1),var(--bg2) 60%,#3b0764);
-    color:#fff;
+    font-family:'Baloo 2',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
     padding:24px 16px 60px;
   }
-  .wrap{max-width:880px;margin:0 auto;}
-  header.top{text-align:center;margin-bottom:22px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:24px;position:relative;}
   header.top .kicker{
-    text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:#c7d2fe;font-weight:700;
+    text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;color:var(--atomic-purple);font-weight:700;margin-bottom:8px;
   }
+  .oval{display:inline-block;padding:10px 40px;border-radius:50% / 65%;background:linear-gradient(120deg,var(--peak),var(--prime));}
   header.top h1{
-    margin:6px 0 4px;font-size:30px;font-weight:800;
-    background:linear-gradient(90deg,var(--peak),#fff,var(--prime));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-family:'Racing Sans One',sans-serif;font-size:38px;margin:0;color:#fff;
+    text-shadow:3px 3px 0 var(--ufo-green),6px 6px 0 var(--atomic-purple);
+    letter-spacing:.02em;transform:skewX(-4deg);font-weight:400;
   }
-  header.top .sub{color:#cbd5e1;font-size:14px;}
+  header.top .sub{color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.05em;margin-top:10px;}
+  header.top .confetti{position:absolute;opacity:.8;font-size:15px;color:var(--ufo-green);}
+  header.top .c1{top:-4px;left:8%;transform:rotate(-10deg);}
+  header.top .c2{top:6px;right:10%;color:var(--prime);font-size:11px;transform:rotate(14deg);}
 
   .scoreboard{
     display:flex;align-items:center;justify-content:center;gap:18px;
-    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-    border-radius:16px;padding:12px 18px;margin:0 auto 20px;max-width:520px;
+    background:var(--card);border:2px solid var(--atomic-purple);
+    border-radius:16px;padding:12px 18px;margin:0 auto 20px;max-width:480px;
   }
   .score-team{display:flex;flex-direction:column;align-items:center;min-width:90px;}
-  .score-team .name{font-weight:700;font-size:13px;}
-  .score-team .num{font-size:32px;font-weight:800;line-height:1;}
+  .score-team .name{font-weight:700;font-size:12.5px;}
+  .score-team .num{font-family:'Racing Sans One';font-size:30px;line-height:1;}
   .score-team.peak .num{color:var(--peak);}
   .score-team.prime .num{color:var(--prime);}
-  .vs-mid{font-size:12px;color:#94a3b8;font-weight:700;}
+  .vs-mid{font-size:11px;color:var(--muted);font-weight:700;text-align:center;}
 
   .dots{display:flex;gap:6px;justify-content:center;margin-bottom:22px;flex-wrap:wrap;}
   .dot{
     width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:11px;font-weight:700;background:rgba(255,255,255,.12);color:#cbd5e1;
-    border:2px solid rgba(255,255,255,.18);
+    font-size:11px;font-weight:700;background:#fff;color:var(--muted);
+    border:2px solid rgba(122,79,224,.3);
   }
-  .dot.active{border-color:#facc15;box-shadow:0 0 0 3px rgba(250,204,21,.25);animation:pulse 1.6s infinite;}
+  .dot.active{border-color:var(--ufo-green);box-shadow:0 0 0 3px rgba(159,224,50,.35);animation:pulse 1.6s infinite;}
   .dot.won-peak{background:var(--peak);color:#fff;border-color:var(--peak);}
   .dot.won-prime{background:var(--prime);color:#fff;border-color:var(--prime);}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(250,204,21,.25);}50%{box-shadow:0 0 0 7px rgba(250,204,21,.08);}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(159,224,50,.35);}50%{box-shadow:0 0 0 7px rgba(159,224,50,.1);}}
 
   .card{
-    background:var(--card);color:var(--ink);border-radius:20px;padding:26px;
-    box-shadow:0 20px 50px rgba(0,0,0,.35);margin-bottom:20px;
+    background:var(--card);color:var(--ink);border-radius:20px;padding:26px 22px 22px;
+    border:4px solid var(--atomic-purple);margin-bottom:20px;position:relative;
   }
-  .cat-label{text-align:center;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
-  .cat-title{text-align:center;font-size:22px;font-weight:800;margin:6px 0 4px;}
-  .cat-desc{text-align:center;color:var(--muted);font-size:13.5px;margin:0 0 20px;font-style:italic;}
+  .cat-label{display:inline-block;background:var(--atomic-purple);color:#fff;font-weight:700;font-size:11.5px;
+    padding:5px 14px;border-radius:999px;}
+  .cat-label-row{text-align:center;margin-bottom:6px;}
+  .cat-title{text-align:center;font-size:19px;font-weight:700;margin:10px 0 2px;}
+  .cat-desc{text-align:center;color:var(--muted);font-size:12.5px;margin:0 0 8px;font-weight:600;}
 
-  .matchup{display:flex;align-items:center;gap:10px;}
+  .sticker-wrap{position:absolute;top:-30px;right:22px;display:flex;align-items:flex-end;}
+  .sticker-wrap img{height:54px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25));}
+  .sticker-wrap img.pair-a{transform:rotate(-10deg);height:50px;margin-right:-12px;}
+  .sticker-wrap img.pair-b{transform:rotate(9deg);}
+  .sticker-wrap img.solo{transform:rotate(8deg);}
+
+  .matchup{display:flex;align-items:center;gap:10px;margin-top:14px;}
   .team-card{
-    flex:1;border-radius:16px;padding:18px 14px;text-align:center;position:relative;
-    border:2px solid transparent;transition:transform .15s;
+    flex:1;border-radius:14px;padding:18px 10px 16px;text-align:center;position:relative;
+    border:2px dashed rgba(255,255,255,.55);
   }
-  .team-card.peak{background:linear-gradient(160deg,#eff6ff,#dbeafe);}
-  .team-card.prime{background:linear-gradient(160deg,#fff7ed,#ffedd5);}
+  .team-card.peak{background:var(--peak);}
+  .team-card.prime{background:var(--prime);}
   .team-card .team-tag{
-    font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;
-    border-radius:999px;display:inline-block;margin-bottom:10px;
+    font-weight:700;font-size:11.5px;letter-spacing:.03em;color:#fff;
   }
-  .team-card.peak .team-tag{background:var(--peak);color:#fff;}
-  .team-card.prime .team-tag{background:var(--prime);color:#fff;}
-  .song-title{font-size:17px;font-weight:800;min-height:24px;word-break:break-word;}
-  .song-artist{font-size:13px;color:var(--muted);margin-top:2px;min-height:18px;}
-  .placeholder{color:#a3a3a3;font-style:italic;}
+  .ministar{position:absolute;top:8px;right:10px;color:#fff;opacity:.65;font-size:12px;}
+  .song-title{font-family:'Racing Sans One';font-size:18px;min-height:22px;word-break:break-word;color:#fff;
+    margin:9px 0 2px;transform:skewX(-3deg);display:inline-block;}
+  .song-artist{font-size:11.5px;color:rgba(255,255,255,.9);margin-top:2px;min-height:16px;font-weight:600;}
+  .placeholder{color:rgba(255,255,255,.7);font-style:italic;}
 
+  .vs-wrap{flex:0 0 auto;width:48px;height:48px;}
   .vs-badge{
-    width:38px;height:38px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;font-size:12px;
-    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+    width:48px;height:48px;border-radius:50%;
+    background:repeating-radial-gradient(circle,#fff 0 4px,#f0eaff 4px 8px);
+    border:3px solid var(--ufo-green);color:var(--atomic-purple);font-family:'Racing Sans One';font-size:13px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 6px rgba(0,0,0,.15);
   }
 
   .vote-btn{
-    margin-top:14px;width:100%;padding:11px 8px;border-radius:12px;border:none;font-weight:800;
-    font-size:14px;cursor:pointer;color:#fff;transition:transform .1s,opacity .1s;
+    margin-top:14px;width:100%;padding:9px 8px;border-radius:999px;border:none;font-weight:700;
+    font-size:13px;cursor:pointer;color:var(--ink);background:#fff;transition:transform .1s,opacity .1s;
+    display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 0 rgba(0,0,0,.12);
   }
+  .vote-btn svg{width:13px;height:13px;flex:0 0 auto;}
+  .vote-btn.peak{transform:rotate(-2deg);}
+  .vote-btn.prime{transform:rotate(2deg);}
   .vote-btn:active{transform:scale(.97);}
-  .vote-btn.peak{background:var(--peak-dark);}
-  .vote-btn.prime{background:var(--prime-dark);}
-  .vote-btn:disabled{opacity:.55;cursor:default;}
+  .vote-btn:disabled{opacity:.6;cursor:default;}
 
-  .tally{margin-top:12px;font-size:13px;color:var(--muted);font-weight:700;}
+  .song-input{
+    width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.6);
+    background:rgba(255,255,255,.92);color:var(--ink);font-size:13.5px;font-family:'Baloo 2';font-weight:600;
+  }
 
-  .bar-row{margin:16px 0 4px;}
-  .bar-track{height:14px;border-radius:999px;background:#e2e8f0;overflow:hidden;display:flex;}
+  .bar-row{margin:18px 0 4px;}
+  .bar-track{height:14px;border-radius:999px;background:#ece7fa;overflow:hidden;display:flex;}
   .bar-peak{background:var(--peak);height:100%;}
   .bar-prime{background:var(--prime);height:100%;}
-  .bar-pcts{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700;margin-top:4px;}
+  .bar-pcts{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-weight:700;margin-top:4px;}
 
-  .status-line{text-align:center;font-size:13px;color:var(--muted);margin-top:14px;}
-  .status-line.open{color:#15803d;font-weight:700;}
-  .status-line.closed{color:#7c2d12;font-weight:700;}
+  .status-line{text-align:center;font-size:12.5px;color:var(--muted);margin-top:14px;font-weight:700;}
+  .status-line.open{color:#3b8f2f;}
+  .status-line.closed{color:var(--atomic-purple);}
 
   .winner-banner{
-    text-align:center;margin-top:14px;padding:10px;border-radius:12px;font-weight:800;font-size:14px;
+    text-align:center;margin-top:14px;padding:10px;border-radius:12px;font-weight:700;font-size:13.5px;
   }
-  .winner-banner.peak{background:#dbeafe;color:var(--peak-dark);}
-  .winner-banner.prime{background:#ffedd5;color:var(--prime-dark);}
+  .winner-banner.peak{background:#e3f0fd;color:var(--peak-dark);}
+  .winner-banner.prime{background:#ffe3f1;color:var(--prime-dark);}
 
   .panel{
-    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;
+    background:var(--card);border:2px solid rgba(122,79,224,.35);border-radius:16px;
     padding:16px 18px;margin-top:6px;
   }
-  .panel h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#c7d2fe;}
+  .panel h3{margin:0 0 10px;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--atomic-purple);}
   .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-  .row label{flex:1;min-width:220px;font-size:12px;color:#cbd5e1;display:block;margin-bottom:4px;font-weight:700;}
+  .row label{flex:1;min-width:220px;font-size:12px;color:var(--muted);display:block;margin-bottom:4px;font-weight:700;}
   .row input{
-    width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);
-    background:rgba(255,255,255,.95);color:#0f172a;font-size:14px;
+    width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(122,79,224,.3);
+    background:#fff;color:var(--ink);font-size:14px;font-family:'Baloo 2';
   }
   .btn{
-    padding:10px 16px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;
-    color:#fff;background:#4f46e5;
+    padding:10px 18px;border-radius:999px;border:none;font-weight:700;font-size:13px;cursor:pointer;
+    color:#fff;background:var(--atomic-purple);font-family:'Baloo 2';
   }
-  .btn.secondary{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);}
-  .btn.danger{background:#b91c1c;}
+  .btn.secondary{background:#fff;border:2px solid var(--atomic-purple);color:var(--atomic-purple);}
+  .btn.danger{background:var(--prime-dark);}
   .btn:disabled{opacity:.4;cursor:default;}
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
 
   .link-box{
     display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;
   }
-  .link-box input{flex:1;min-width:200px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.95);color:#0f172a;font-size:12.5px;}
+  .link-box input{flex:1;min-width:200px;padding:9px 10px;border-radius:8px;border:1px solid rgba(122,79,224,.3);background:#fff;color:var(--ink);font-size:12.5px;font-family:'Baloo 2';}
 
   .banner{
-    text-align:center;background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:10px;
-    font-size:12.5px;font-weight:700;margin-bottom:16px;
+    text-align:center;background:#fff4d6;color:#8a5a00;padding:8px 12px;border-radius:10px;
+    font-size:12.5px;font-weight:700;margin-bottom:16px;border:1px solid #f3d38a;
   }
 
-  .landing{max-width:520px;margin:60px auto 0;text-align:center;}
+  .landing{max-width:520px;margin:40px auto 0;text-align:center;}
   .landing .card{padding:34px 26px;}
-  .landing h2{margin-top:0;}
-  .landing p{color:var(--muted);font-size:14px;line-height:1.5;}
+  .landing h2{margin-top:0;font-size:20px;}
+  .landing p{color:var(--muted);font-size:13.5px;line-height:1.5;font-weight:600;}
   .landing .btn{width:100%;padding:14px;font-size:15px;margin-top:8px;}
-  .landing .divider{color:#cbd5e1;font-size:12px;margin:16px 0;text-transform:uppercase;letter-spacing:.08em;}
+  .landing .divider{color:var(--muted);font-size:11.5px;margin:16px 0;text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
   .landing .join-row{display:flex;gap:8px;}
-  .landing .join-row input{flex:1;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;}
+  .landing .join-row input{flex:1;padding:11px;border-radius:10px;border:1px solid rgba(122,79,224,.3);font-size:14px;font-family:'Baloo 2';}
 
   .celebrate{text-align:center;padding:50px 20px;}
-  .celebrate .trophy{font-size:64px;}
-  .celebrate h2{font-size:28px;margin:10px 0 6px;}
-  .confetti{position:fixed;top:-20px;font-size:22px;animation:fall linear infinite;pointer-events:none;}
+  .celebrate .trophy{font-size:60px;}
+  .celebrate h2{font-family:'Racing Sans One';font-size:26px;margin:12px 0 6px;color:var(--atomic-purple);font-weight:400;}
+  .confetti{position:fixed;top:-20px;font-size:20px;animation:fall linear infinite;pointer-events:none;}
   @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2;}}
 
-  footer.note{text-align:center;color:#94a3b8;font-size:11.5px;margin-top:28px;}
-  a{color:#93c5fd;}
+  footer.note{text-align:center;color:var(--muted);font-size:11px;margin-top:28px;font-weight:600;}
+  footer.note a{color:var(--atomic-purple);font-weight:700;}
+  a{color:var(--atomic-purple);}
 </style>
 </head>
 <body>
@@ -172,16 +194,26 @@
 <script>
 /* ============ ROUND DATA ============ */
 const ROUND_DEFS = [
-  {category:"“It's 4:55 PM on a Friday” Anthem", desc:"The exact song that flips your brain into weekend mode."},
-  {category:"Guilty Pleasure You Know Every Word To", desc:"Unabashed, zero-shame, belt-it-out song."},
-  {category:"The Floor-Filler (Party Starter)", desc:"Physically impossible to stay seated when this comes on."},
-  {category:"Best Intro / First 10 Seconds", desc:"A track that instantly hooks you within the first few seconds."},
-  {category:"Instant Nostalgia Trap", desc:"Takes you straight back to a core memory the second the first note hits."},
-  {category:"The One-Hit Wonder", desc:"An iconic track from an artist who came, conquered, and vanished."},
-  {category:"The Unmatched Duet / Collab", desc:"Two artists coming together to make absolute magic."},
-  {category:"The Karaoke Crowd-Pleaser", desc:"The song that gets the entire room holding imaginary microphones."},
-  {category:"Smells Like Summer", desc:"Pure sunshine energy encapsulated in 3 minutes."},
-  {category:"The Ultimate Road Trip Song", desc:"Windows down, highway driving, full car chorus."}
+  {category:"“It's 4:55 PM on a Friday” Anthem", desc:"The exact song that flips your brain into weekend mode.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/12640/12640031.png","https://cdn-icons-png.flaticon.com/256/6347/6347431.png"]},
+  {category:"Guilty Pleasure You Know Every Word To", desc:"Unabashed, zero-shame, belt-it-out song.",
+   stickers:["https://cdn-icons-png.flaticon.com/128/5835/5835834.png","https://cdn-icons-png.flaticon.com/256/7387/7387451.png"]},
+  {category:"The Floor-Filler (Party Starter)", desc:"Physically impossible to stay seated when this comes on.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/7295/7295534.png"]},
+  {category:"Best Intro / First 10 Seconds", desc:"A track that instantly hooks you within the first few seconds.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/6534/6534341.png"]},
+  {category:"Instant Nostalgia Trap", desc:"Takes you straight back to a core memory the second the first note hits.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/14116/14116585.png","https://cdn-icons-png.flaticon.com/256/6397/6397089.png"]},
+  {category:"The One-Hit Wonder", desc:"An iconic track from an artist who came, conquered, and vanished.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/10872/10872582.png"]},
+  {category:"The Unmatched Duet / Collab", desc:"Two artists coming together to make absolute magic.",
+   stickers:["https://cdn-icons-png.flaticon.com/128/7463/7463153.png"]},
+  {category:"The Karaoke Crowd-Pleaser", desc:"The song that gets the entire room holding imaginary microphones.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/9306/9306390.png"]},
+  {category:"Smells Like Summer", desc:"Pure sunshine energy encapsulated in 3 minutes.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/7734/7734862.png"]},
+  {category:"The Ultimate Road Trip Song", desc:"Windows down, highway driving, full car chorus.",
+   stickers:["https://cdn-icons-png.flaticon.com/256/7496/7496829.png"]}
 ];
 
 function defaultState(){
@@ -192,6 +224,7 @@ function defaultState(){
     rounds: ROUND_DEFS.map(r => ({
       category: r.category,
       desc: r.desc,
+      stickers: r.stickers,
       peakSong: "", peakArtist: "",
       primeSong: "", primeArtist: "",
       peakVotes: 0, primeVotes: 0,
@@ -323,12 +356,15 @@ function esc(s){
   const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
 }
 
+const starIconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.6 6.6L21 9l-5 4.6L17.4 21 12 17l-5.4 4L8 13.6 3 9l6.4-.4z"/></svg>`;
+
 function renderLanding(){
   app.innerHTML = `
     <header class="top">
+      <span class="confetti c1">&#9733;</span><span class="confetti c2">&#9733;</span>
       <div class="kicker">Vendor Solutions Engagement · Showdown Series Vol. 2</div>
-      <h1>🎧 AUX-OFF</h1>
-      <div class="sub">Team Peak vs. Team Prime — 10 Rounds, Live Voting</div>
+      <div class="oval"><h1>AUX-OFF</h1></div>
+      <div class="sub">TEAM PEAK VS. TEAM PRIME — 10 ROUNDS, LIVE VOTING</div>
     </header>
     <div class="landing">
       <div class="card">
@@ -343,7 +379,7 @@ function renderLanding(){
         </div>
       </div>
     </div>
-    <footer class="note">Built for the Vendor Solutions Engagement team · votes sync via a free public relay, so give it a quick test before the event.</footer>
+    <footer class="note">Built for the Vendor Solutions Engagement team · votes sync via Firebase, so give it a quick test before the event. Stickers via <a href="https://www.flaticon.com" target="_blank" rel="noopener">Flaticon</a>.</footer>
   `;
   document.getElementById('startHostBtn').onclick = async () => {
     try{
@@ -408,6 +444,13 @@ function barsHtml(r){
     </div>`;
 }
 
+function stickerHtml(r){
+  const s = r.stickers || [];
+  if(s.length === 0) return '';
+  if(s.length === 1) return `<div class="sticker-wrap"><img class="solo" src="${s[0]}" alt=""></div>`;
+  return `<div class="sticker-wrap"><img class="pair-a" src="${s[0]}" alt=""><img class="pair-b" src="${s[1]}" alt=""></div>`;
+}
+
 function syncBanner(){
   return syncOk ? '' : `<div class="banner">⚠️ Live sync is having trouble reaching the relay. Votes on this device may not be visible to others until it reconnects.</div>`;
 }
@@ -437,22 +480,25 @@ function renderMatchupCard(i, editable){
 
   return `
     <div class="card">
-      <div class="cat-label">Round ${i+1} of ${state.rounds.length}</div>
+      ${stickerHtml(r)}
+      <div class="cat-label-row"><span class="cat-label">Round ${i+1} of ${state.rounds.length}</span></div>
       <div class="cat-title">${esc(r.category)}</div>
       <div class="cat-desc">${esc(r.desc)}</div>
       <div class="matchup">
         <div class="team-card peak">
-          <span class="team-tag">Team Peak</span>
+          <span class="ministar">&#9733;</span>
+          <span class="team-tag">TEAM PEAK</span>
           ${peakSongHtml}
           ${editable ? `<input placeholder="Artist" value="${esc(r.peakArtist)}" data-field="peakArtist" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
-          ${!editable ? `<button class="vote-btn peak" data-round="${i}" data-team="peak" ${canVote?'':'disabled'}>${votedTeam==='peak' ? '✅ Your Vote' : (r.status==='open' ? 'Vote Peak 🔵' : '—')}</button>` : ''}
+          ${!editable ? `<button class="vote-btn peak" data-round="${i}" data-team="peak" ${canVote?'':'disabled'}>${votedTeam==='peak' ? '✅ Your Vote' : (r.status==='open' ? starIconSvg + 'Vote Peak' : '—')}</button>` : ''}
         </div>
-        <div class="vs-badge">VS</div>
+        <div class="vs-wrap"><div class="vs-badge">VS</div></div>
         <div class="team-card prime">
-          <span class="team-tag">Team Prime</span>
+          <span class="ministar">&#9733;</span>
+          <span class="team-tag">TEAM PRIME</span>
           ${primeSongHtml}
           ${editable ? `<input placeholder="Artist" value="${esc(r.primeArtist)}" data-field="primeArtist" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
-          ${!editable ? `<button class="vote-btn prime" data-round="${i}" data-team="prime" ${canVote?'':'disabled'}>${votedTeam==='prime' ? '✅ Your Vote' : (r.status==='open' ? 'Vote Prime 🟠' : '—')}</button>` : ''}
+          ${!editable ? `<button class="vote-btn prime" data-round="${i}" data-team="prime" ${canVote?'':'disabled'}>${votedTeam==='prime' ? '✅ Your Vote' : (r.status==='open' ? starIconSvg + 'Vote Prime' : '—')}</button>` : ''}
         </div>
       </div>
       ${showBars ? barsHtml(r) : ''}
@@ -465,9 +511,10 @@ function renderVoter(){
   const i = state.currentRound;
   app.innerHTML = `
     <header class="top">
+      <span class="confetti c1">&#9733;</span><span class="confetti c2">&#9733;</span>
       <div class="kicker">Vendor Solutions Engagement · Showdown Series Vol. 2</div>
-      <h1>🎧 AUX-OFF</h1>
-      <div class="sub">Team Peak vs. Team Prime — Live Voting</div>
+      <div class="oval"><h1>AUX-OFF</h1></div>
+      <div class="sub">TEAM PEAK VS. TEAM PRIME — LIVE VOTING</div>
     </header>
     ${syncBanner()}
     ${scoreboardHtml()}
@@ -487,9 +534,10 @@ function renderHost(){
 
   app.innerHTML = `
     <header class="top">
+      <span class="confetti c1">&#9733;</span><span class="confetti c2">&#9733;</span>
       <div class="kicker">Vendor Solutions Engagement · Showdown Series Vol. 2 · HOST VIEW</div>
-      <h1>🎧 AUX-OFF</h1>
-      <div class="sub">Team Peak vs. Team Prime — Live Voting</div>
+      <div class="oval"><h1>AUX-OFF</h1></div>
+      <div class="sub">TEAM PEAK VS. TEAM PRIME — LIVE VOTING</div>
     </header>
     ${syncBanner()}
     ${scoreboardHtml()}
@@ -533,17 +581,17 @@ function renderHost(){
 
 function renderFinished(){
   const winner = state.score.peak === state.score.prime ? 'tie' : (state.score.peak > state.score.prime ? 'peak' : 'prime');
-  const confettiEmojis = ['🎉','🎶','🔥','🏆','✨'];
+  const confettiEmojis = ['★','✦','🎶','🏆','✨'];
   let confetti = '';
   for(let k=0;k<24;k++){
-    confetti += `<div class="confetti" style="left:${Math.random()*100}vw;animation-duration:${3+Math.random()*3}s;animation-delay:${Math.random()*2}s;">${confettiEmojis[k%confettiEmojis.length]}</div>`;
+    confetti += `<div class="confetti" style="left:${Math.random()*100}vw;animation-duration:${3+Math.random()*3}s;animation-delay:${Math.random()*2}s;color:${k%2?'var(--prime)':'var(--peak)'}">${confettiEmojis[k%confettiEmojis.length]}</div>`;
   }
   app.innerHTML = `
     ${confetti}
     <div class="celebrate">
       <div class="trophy">🏆</div>
-      <h2>${winner==='tie' ? "It's a tie! 🤝" : `Team ${winner==='peak'?'Peak':'Prime'} takes the crown!`}</h2>
-      <div class="sub" style="color:#cbd5e1;">Final score — Team Peak ${state.score.peak} : ${state.score.prime} Team Prime</div>
+      <h2>${winner==='tie' ? "It's a tie!" : `Team ${winner==='peak'?'Peak':'Prime'} takes the crown!`}</h2>
+      <div class="sub" style="color:var(--muted);font-weight:700;">Final score — Team Peak ${state.score.peak} : ${state.score.prime} Team Prime</div>
       <div style="margin-top:24px;">${dotsHtml()}</div>
       ${IS_HOST ? `<div class="btn-row" style="justify-content:center;margin-top:20px;"><button class="btn danger" id="resetBtn2">Reset for a rematch</button></div>` : ''}
     </div>
