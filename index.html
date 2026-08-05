@@ -209,25 +209,23 @@ let pollTimer = null;
 let state = defaultState();
 let lastSeen = "";
 
-function stateUrl(){ return `https://kvdb.io/${BUCKET}/state`; }
+const FIREBASE_BASE = 'https://aux-off-vol2-default-rtdb.firebaseio.com';
+function stateUrl(){ return `${FIREBASE_BASE}/sessions/${BUCKET}.json`; }
 
 async function createBucket(){
-  const email = `auxoff-${Date.now()}@example.com`;
-  const res = await fetch('https://kvdb.io/', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    body: 'email=' + encodeURIComponent(email)
-  });
-  if(!res.ok) throw new Error('bucket create failed: HTTP ' + res.status);
-  const id = (await res.text()).trim();
-  if(!id) throw new Error('bucket create returned empty id');
-  return id;
+  // Firebase doesn't need a create step - just mint a random session id.
+  // Existence is established the first time we PUT state to it.
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 }
 async function pushState(){
   if(!BUCKET) return;
   try{
-    await fetch(stateUrl(), {method:'POST', body: JSON.stringify(state)});
-    syncOk = true;
+    const res = await fetch(stateUrl(), {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(state)
+    });
+    syncOk = res.ok;
   }catch(e){ syncOk = false; }
 }
 async function pullState(){
@@ -235,10 +233,11 @@ async function pullState(){
   try{
     const res = await fetch(stateUrl(), {cache:'no-store'});
     if(res.ok){
-      const txt = await res.text();
-      if(txt && txt !== lastSeen){
+      const data = await res.json();
+      const txt = JSON.stringify(data);
+      if(data && txt !== lastSeen){
         lastSeen = txt;
-        state = JSON.parse(txt);
+        state = data;
       }
       syncOk = true;
     }
