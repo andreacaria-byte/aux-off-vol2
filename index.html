@@ -212,9 +212,15 @@ let lastSeen = "";
 function stateUrl(){ return `https://kvdb.io/${BUCKET}/state`; }
 
 async function createBucket(){
-  const res = await fetch('https://kvdb.io/', {method:'POST'});
-  if(!res.ok) throw new Error('bucket create failed');
+  const email = `auxoff-${Date.now()}@example.com`;
+  const res = await fetch('https://kvdb.io/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'email=' + encodeURIComponent(email)
+  });
+  if(!res.ok) throw new Error('bucket create failed: HTTP ' + res.status);
   const id = (await res.text()).trim();
+  if(!id) throw new Error('bucket create returned empty id');
   return id;
 }
 async function pushState(){
@@ -354,7 +360,7 @@ function renderLanding(){
       startPolling();
       render();
     }catch(e){
-      alert('Could not reach the live-sync service right now. Check your connection and try again.');
+      alert('Could not reach the live-sync service right now (' + e.message + '). Check your connection and try again.');
     }
   };
   document.getElementById('joinBtn').onclick = () => {
