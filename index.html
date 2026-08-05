@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUX-OFF Vol. 2 — Team Peak vs Team Prime</title>
+<style>
+  :root{
+    --peak:#3b82f6;
+    --peak-dark:#1d4ed8;
+    --prime:#f97316;
+    --prime-dark:#c2410c;
+    --bg1:#0f172a;
+    --bg2:#1e1b4b;
+    --card:#ffffff;
+    --ink:#0f172a;
+    --muted:#64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2) 60%,#3b0764);
+    color:#fff;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:22px;}
+  header.top .kicker{
+    text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:#c7d2fe;font-weight:700;
+  }
+  header.top h1{
+    margin:6px 0 4px;font-size:30px;font-weight:800;
+    background:linear-gradient(90deg,var(--peak),#fff,var(--prime));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header.top .sub{color:#cbd5e1;font-size:14px;}
+
+  .scoreboard{
+    display:flex;align-items:center;justify-content:center;gap:18px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:16px;padding:12px 18px;margin:0 auto 20px;max-width:520px;
+  }
+  .score-team{display:flex;flex-direction:column;align-items:center;min-width:90px;}
+  .score-team .name{font-weight:700;font-size:13px;}
+  .score-team .num{font-size:32px;font-weight:800;line-height:1;}
+  .score-team.peak .num{color:var(--peak);}
+  .score-team.prime .num{color:var(--prime);}
+  .vs-mid{font-size:12px;color:#94a3b8;font-weight:700;}
+
+  .dots{display:flex;gap:6px;justify-content:center;margin-bottom:22px;flex-wrap:wrap;}
+  .dot{
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;background:rgba(255,255,255,.12);color:#cbd5e1;
+    border:2px solid rgba(255,255,255,.18);
+  }
+  .dot.active{border-color:#facc15;box-shadow:0 0 0 3px rgba(250,204,21,.25);animation:pulse 1.6s infinite;}
+  .dot.won-peak{background:var(--peak);color:#fff;border-color:var(--peak);}
+  .dot.won-prime{background:var(--prime);color:#fff;border-color:var(--prime);}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(250,204,21,.25);}50%{box-shadow:0 0 0 7px rgba(250,204,21,.08);}}
+
+  .card{
+    background:var(--card);color:var(--ink);border-radius:20px;padding:26px;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);margin-bottom:20px;
+  }
+  .cat-label{text-align:center;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
+  .cat-title{text-align:center;font-size:22px;font-weight:800;margin:6px 0 4px;}
+  .cat-desc{text-align:center;color:var(--muted);font-size:13.5px;margin:0 0 20px;font-style:italic;}
+
+  .matchup{display:flex;align-items:center;gap:10px;}
+  .team-card{
+    flex:1;border-radius:16px;padding:18px 14px;text-align:center;position:relative;
+    border:2px solid transparent;transition:transform .15s;
+  }
+  .team-card.peak{background:linear-gradient(160deg,#eff6ff,#dbeafe);}
+  .team-card.prime{background:linear-gradient(160deg,#fff7ed,#ffedd5);}
+  .team-card .team-tag{
+    font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;
+    border-radius:999px;display:inline-block;margin-bottom:10px;
+  }
+  .team-card.peak .team-tag{background:var(--peak);color:#fff;}
+  .team-card.prime .team-tag{background:var(--prime);color:#fff;}
+  .song-title{font-size:17px;font-weight:800;min-height:24px;word-break:break-word;}
+  .song-artist{font-size:13px;color:var(--muted);margin-top:2px;min-height:18px;}
+  .placeholder{color:#a3a3a3;font-style:italic;}
+
+  .vs-badge{
+    width:38px;height:38px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;font-size:12px;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+
+  .vote-btn{
+    margin-top:14px;width:100%;padding:11px 8px;border-radius:12px;border:none;font-weight:800;
+    font-size:14px;cursor:pointer;color:#fff;transition:transform .1s,opacity .1s;
+  }
+  .vote-btn:active{transform:scale(.97);}
+  .vote-btn.peak{background:var(--peak-dark);}
+  .vote-btn.prime{background:var(--prime-dark);}
+  .vote-btn:disabled{opacity:.55;cursor:default;}
+
+  .tally{margin-top:12px;font-size:13px;color:var(--muted);font-weight:700;}
+
+  .bar-row{margin:16px 0 4px;}
+  .bar-track{height:14px;border-radius:999px;background:#e2e8f0;overflow:hidden;display:flex;}
+  .bar-peak{background:var(--peak);height:100%;}
+  .bar-prime{background:var(--prime);height:100%;}
+  .bar-pcts{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700;margin-top:4px;}
+
+  .status-line{text-align:center;font-size:13px;color:var(--muted);margin-top:14px;}
+  .status-line.open{color:#15803d;font-weight:700;}
+  .status-line.closed{color:#7c2d12;font-weight:700;}
+
+  .winner-banner{
+    text-align:center;margin-top:14px;padding:10px;border-radius:12px;font-weight:800;font-size:14px;
+  }
+  .winner-banner.peak{background:#dbeafe;color:var(--peak-dark);}
+  .winner-banner.prime{background:#ffedd5;color:var(--prime-dark);}
+
+  .panel{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;
+    padding:16px 18px;margin-top:6px;
+  }
+  .panel h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#c7d2fe;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+  .row label{flex:1;min-width:220px;font-size:12px;color:#cbd5e1;display:block;margin-bottom:4px;font-weight:700;}
+  .row input{
+    width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.95);color:#0f172a;font-size:14px;
+  }
+  .btn{
+    padding:10px 16px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;
+    color:#fff;background:#4f46e5;
+  }
+  .btn.secondary{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);}
+  .btn.danger{background:#b91c1c;}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+  .link-box{
+    display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;
+  }
+  .link-box input{flex:1;min-width:200px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.95);color:#0f172a;font-size:12.5px;}
+
+  .banner{
+    text-align:center;background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:10px;
+    font-size:12.5px;font-weight:700;margin-bottom:16px;
+  }
+
+  .landing{max-width:520px;margin:60px auto 0;text-align:center;}
+  .landing .card{padding:34px 26px;}
+  .landing h2{margin-top:0;}
+  .landing p{color:var(--muted);font-size:14px;line-height:1.5;}
+  .landing .btn{width:100%;padding:14px;font-size:15px;margin-top:8px;}
+  .landing .divider{color:#cbd5e1;font-size:12px;margin:16px 0;text-transform:uppercase;letter-spacing:.08em;}
+  .landing .join-row{display:flex;gap:8px;}
+  .landing .join-row input{flex:1;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;}
+
+  .celebrate{text-align:center;padding:50px 20px;}
+  .celebrate .trophy{font-size:64px;}
+  .celebrate h2{font-size:28px;margin:10px 0 6px;}
+  .confetti{position:fixed;top:-20px;font-size:22px;animation:fall linear infinite;pointer-events:none;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2;}}
+
+  footer.note{text-align:center;color:#94a3b8;font-size:11.5px;margin-top:28px;}
+  a{color:#93c5fd;}
+</style>
+</head>
+<body>
+<div id="app" class="wrap"></div>
+
+<script>
+/* ============ ROUND DATA ============ */
+const ROUND_DEFS = [
+  {category:"“It's 4:55 PM on a Friday” Anthem", desc:"The exact song that flips your brain into weekend mode."},
+  {category:"Guilty Pleasure You Know Every Word To", desc:"Unabashed, zero-shame, belt-it-out song."},
+  {category:"The Floor-Filler (Party Starter)", desc:"Physically impossible to stay seated when this comes on."},
+  {category:"Best Intro / First 10 Seconds", desc:"A track that instantly hooks you within the first few seconds."},
+  {category:"Instant Nostalgia Trap", desc:"Takes you straight back to a core memory the second the first note hits."},
+  {category:"The One-Hit Wonder", desc:"An iconic track from an artist who came, conquered, and vanished."},
+  {category:"The Unmatched Duet / Collab", desc:"Two artists coming together to make absolute magic."},
+  {category:"The Karaoke Crowd-Pleaser", desc:"The song that gets the entire room holding imaginary microphones."},
+  {category:"Smells Like Summer", desc:"Pure sunshine energy encapsulated in 3 minutes."},
+  {category:"The Ultimate Road Trip Song", desc:"Windows down, highway driving, full car chorus."}
+];
+
+function defaultState(){
+  return {
+    currentRound: 0,
+    finished: false,
+    score: {peak:0, prime:0},
+    rounds: ROUND_DEFS.map(r => ({
+      category: r.category,
+      desc: r.desc,
+      peakSong: "", peakArtist: "",
+      primeSong: "", primeArtist: "",
+      peakVotes: 0, primeVotes: 0,
+      status: "pending" // pending -> open -> closed
+    }))
+  };
+}
+
+/* ============ URL / SYNC HELPERS ============ */
+const params = new URLSearchParams(location.search);
+let BUCKET = params.get('bucket') || null;
+let IS_HOST = params.get('host') === '1';
+let syncOk = true;
+let pollTimer = null;
+let state = defaultState();
+let lastSeen = "";
+
+function stateUrl(){ return `https://kvdb.io/${BUCKET}/state`; }
+
+async function createBucket(){
+  const res = await fetch('https://kvdb.io/', {method:'POST'});
+  if(!res.ok) throw new Error('bucket create failed');
+  const id = (await res.text()).trim();
+  return id;
+}
+async function pushState(){
+  if(!BUCKET) return;
+  try{
+    await fetch(stateUrl(), {method:'POST', body: JSON.stringify(state)});
+    syncOk = true;
+  }catch(e){ syncOk = false; }
+}
+async function pullState(){
+  if(!BUCKET) return;
+  try{
+    const res = await fetch(stateUrl(), {cache:'no-store'});
+    if(res.ok){
+      const txt = await res.text();
+      if(txt && txt !== lastSeen){
+        lastSeen = txt;
+        state = JSON.parse(txt);
+      }
+      syncOk = true;
+    }
+  }catch(e){ syncOk = false; }
+  render();
+}
+function startPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(pullState, 2200);
+}
+
+function voterLink(){
+  const u = new URL(location.href);
+  u.search = '';
+  u.searchParams.set('bucket', BUCKET);
+  return u.toString();
+}
+function hostLink(){
+  const u = new URL(location.href);
+  u.search = '';
+  u.searchParams.set('bucket', BUCKET);
+  u.searchParams.set('host','1');
+  return u.toString();
+}
+
+function votedKey(i){ return `auxoff2_voted_${BUCKET}_${i}`; }
+function hasVoted(i){ return !!localStorage.getItem(votedKey(i)); }
+function setVoted(i, team){ localStorage.setItem(votedKey(i), team); }
+
+/* ============ ACTIONS ============ */
+async function castVote(i, team){
+  if(hasVoted(i)) return;
+  setVoted(i, team);
+  await pullState(); // get freshest counts first to reduce collisions
+  if(team === 'peak') state.rounds[i].peakVotes++; else state.rounds[i].primeVotes++;
+  render();
+  await pushState();
+}
+
+async function updateSong(i, field, value){
+  state.rounds[i][field] = value;
+  await pushState();
+}
+
+async function openVoting(i){
+  state.rounds[i].status = 'open';
+  render();
+  await pushState();
+}
+
+async function lockRound(i){
+  await pullState();
+  const r = state.rounds[i];
+  r.status = 'closed';
+  if(r.peakVotes > r.primeVotes){ r.winner='peak'; state.score.peak++; }
+  else if(r.primeVotes > r.peakVotes){ r.winner='prime'; state.score.prime++; }
+  else { r.winner='tie'; }
+  render();
+  await pushState();
+}
+
+async function nextRound(){
+  if(state.currentRound < state.rounds.length - 1){
+    state.currentRound++;
+  } else {
+    state.finished = true;
+  }
+  render();
+  await pushState();
+}
+
+async function resetEvent(){
+  if(!confirm('Reset all rounds and votes for everyone?')) return;
+  state = defaultState();
+  render();
+  await pushState();
+}
+
+/* ============ RENDER ============ */
+const app = document.getElementById('app');
+
+function esc(s){
+  const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
+}
+
+function renderLanding(){
+  app.innerHTML = `
+    <header class="top">
+      <div class="kicker">Vendor Solutions Engagement · Showdown Series Vol. 2</div>
+      <h1>🎧 AUX-OFF</h1>
+      <div class="sub">Team Peak vs. Team Prime — 10 Rounds, Live Voting</div>
+    </header>
+    <div class="landing">
+      <div class="card">
+        <h2>Start or join the showdown</h2>
+        <p>The host starts the event once, then shares one link with everyone so votes sync live across every phone.</p>
+        <button class="btn" id="startHostBtn">🚀 Start as Host</button>
+        <div class="divider">— or —</div>
+        <p style="margin-bottom:6px;">Have a link from your host? Paste it here:</p>
+        <div class="join-row">
+          <input id="joinInput" placeholder="Paste the shared aux-off link">
+          <button class="btn secondary" id="joinBtn">Join</button>
+        </div>
+      </div>
+    </div>
+    <footer class="note">Built for the Vendor Solutions Engagement team · votes sync via a free public relay, so give it a quick test before the event.</footer>
+  `;
+  document.getElementById('startHostBtn').onclick = async () => {
+    try{
+      BUCKET = await createBucket();
+      IS_HOST = true;
+      const u = new URL(location.href);
+      u.searchParams.set('bucket', BUCKET);
+      u.searchParams.set('host','1');
+      history.replaceState({}, '', u.toString());
+      state = defaultState();
+      await pushState();
+      lastSeen = JSON.stringify(state);
+      startPolling();
+      render();
+    }catch(e){
+      alert('Could not reach the live-sync service right now. Check your connection and try again.');
+    }
+  };
+  document.getElementById('joinBtn').onclick = () => {
+    const val = document.getElementById('joinInput').value.trim();
+    if(!val) return;
+    try{
+      const u = new URL(val);
+      const b = u.searchParams.get('bucket');
+      if(!b) throw new Error();
+      location.href = `${location.pathname}?bucket=${b}`;
+    }catch(e){ alert('That link doesn\'t look right — ask your host to resend it.'); }
+  };
+}
+
+function scoreboardHtml(){
+  return `
+    <div class="scoreboard">
+      <div class="score-team peak"><div class="name">TEAM PEAK</div><div class="num">${state.score.peak}</div></div>
+      <div class="vs-mid">ROUNDS<br>WON</div>
+      <div class="score-team prime"><div class="name">TEAM PRIME</div><div class="num">${state.score.prime}</div></div>
+    </div>`;
+}
+
+function dotsHtml(){
+  return `<div class="dots">${state.rounds.map((r,i)=>{
+    let cls = 'dot';
+    if(r.status==='closed'){
+      if(r.winner==='peak') cls+=' won-peak';
+      else if(r.winner==='prime') cls+=' won-prime';
+    } else if(i===state.currentRound) cls+=' active';
+    return `<div class="${cls}" title="Round ${i+1}: ${esc(r.category)}">${i+1}</div>`;
+  }).join('')}</div>`;
+}
+
+function barsHtml(r){
+  const total = r.peakVotes + r.primeVotes;
+  const peakPct = total ? Math.round((r.peakVotes/total)*100) : 50;
+  const primePct = 100 - peakPct;
+  return `
+    <div class="bar-row">
+      <div class="bar-track">
+        <div class="bar-peak" style="width:${total?peakPct:50}%"></div>
+        <div class="bar-prime" style="width:${total?primePct:50}%"></div>
+      </div>
+      <div class="bar-pcts"><span>${r.peakVotes} votes (${total?peakPct:0}%)</span><span>${r.primeVotes} votes (${total?primePct:0}%)</span></div>
+    </div>`;
+}
+
+function syncBanner(){
+  return syncOk ? '' : `<div class="banner">⚠️ Live sync is having trouble reaching the relay. Votes on this device may not be visible to others until it reconnects.</div>`;
+}
+
+function renderMatchupCard(i, editable){
+  const r = state.rounds[i];
+  const voted = hasVoted(i);
+  const votedTeam = localStorage.getItem(votedKey(i));
+
+  const peakSongHtml = editable
+    ? `<input placeholder="Song title" value="${esc(r.peakSong)}" data-field="peakSong" data-round="${i}" class="song-input">`
+    : `<div class="song-title">${r.peakSong ? esc(r.peakSong) : '<span class="placeholder">Song TBD</span>'}</div><div class="song-artist">${esc(r.peakArtist)}</div>`;
+  const primeSongHtml = editable
+    ? `<input placeholder="Song title" value="${esc(r.primeSong)}" data-field="primeSong" data-round="${i}" class="song-input">`
+    : `<div class="song-title">${r.primeSong ? esc(r.primeSong) : '<span class="placeholder">Song TBD</span>'}</div><div class="song-artist">${esc(r.primeArtist)}</div>`;
+
+  let statusLine = '';
+  if(r.status==='pending') statusLine = `<div class="status-line">Voting hasn't opened yet</div>`;
+  if(r.status==='open') statusLine = `<div class="status-line open">🟢 Voting is live — cast your vote!</div>`;
+  if(r.status==='closed'){
+    if(r.winner==='tie') statusLine = `<div class="winner-banner">🤝 It's a tie!</div>`;
+    else statusLine = `<div class="winner-banner ${r.winner}">🏆 Team ${r.winner==='peak'?'Peak':'Prime'} wins this round!</div>`;
+  }
+
+  const showBars = r.status==='open' || r.status==='closed';
+  const canVote = r.status==='open' && !voted;
+
+  return `
+    <div class="card">
+      <div class="cat-label">Round ${i+1} of ${state.rounds.length}</div>
+      <div class="cat-title">${esc(r.category)}</div>
+      <div class="cat-desc">${esc(r.desc)}</div>
+      <div class="matchup">
+        <div class="team-card peak">
+          <span class="team-tag">Team Peak</span>
+          ${peakSongHtml}
+          ${editable ? `<input placeholder="Artist" value="${esc(r.peakArtist)}" data-field="peakArtist" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
+          ${!editable ? `<button class="vote-btn peak" data-round="${i}" data-team="peak" ${canVote?'':'disabled'}>${votedTeam==='peak' ? '✅ Your Vote' : (r.status==='open' ? 'Vote Peak 🔵' : '—')}</button>` : ''}
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="team-card prime">
+          <span class="team-tag">Team Prime</span>
+          ${primeSongHtml}
+          ${editable ? `<input placeholder="Artist" value="${esc(r.primeArtist)}" data-field="primeArtist" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
+          ${!editable ? `<button class="vote-btn prime" data-round="${i}" data-team="prime" ${canVote?'':'disabled'}>${votedTeam==='prime' ? '✅ Your Vote' : (r.status==='open' ? 'Vote Prime 🟠' : '—')}</button>` : ''}
+        </div>
+      </div>
+      ${showBars ? barsHtml(r) : ''}
+      ${statusLine}
+    </div>
+  `;
+}
+
+function renderVoter(){
+  const i = state.currentRound;
+  app.innerHTML = `
+    <header class="top">
+      <div class="kicker">Vendor Solutions Engagement · Showdown Series Vol. 2</div>
+      <h1>🎧 AUX-OFF</h1>
+      <div class="sub">Team Peak vs. Team Prime — Live Voting</div>
+    </header>
+    ${syncBanner()}
+    ${scoreboardHtml()}
+    ${dotsHtml()}
+    ${renderMatchupCard(i, false)}
+    <footer class="note">Vote once per round from this device · results update automatically every couple of seconds.</footer>
+  `;
+  app.querySelectorAll('.vote-btn').forEach(btn=>{
+    btn.onclick = () => castVote(parseInt(btn.dataset.round), btn.dataset.team);
+  });
+}
+
+function renderHost(){
+  const i = state.currentRound;
+  const r = state.rounds[i];
+  const link = voterLink();
+
+  app.innerHTML = `
+    <header class="top">
+      <div class="kicker">Vendor Solutions Engagement · Showdown Series Vol. 2 · HOST VIEW</div>
+      <h1>🎧 AUX-OFF</h1>
+      <div class="sub">Team Peak vs. Team Prime — Live Voting</div>
+    </header>
+    ${syncBanner()}
+    ${scoreboardHtml()}
+    ${dotsHtml()}
+
+    <div class="panel" style="margin-bottom:20px;">
+      <h3>📎 Share with your team (voter link)</h3>
+      <div class="link-box">
+        <input readonly value="${link}" id="voterLinkInput">
+        <button class="btn secondary" id="copyLinkBtn">Copy</button>
+      </div>
+    </div>
+
+    ${renderMatchupCard(i, r.status==='pending')}
+
+    <div class="panel">
+      <h3>Host controls — Round ${i+1}</h3>
+      <div class="btn-row">
+        ${r.status==='pending' ? `<button class="btn" id="openBtn">🎬 Open Voting</button>` : ''}
+        ${r.status==='open' ? `<button class="btn" id="lockBtn">🔒 Lock &amp; Reveal Winner</button>` : ''}
+        ${r.status==='closed' ? `<button class="btn" id="nextBtn">${i < state.rounds.length-1 ? 'Next Round →' : 'Finish Event 🏁'}</button>` : ''}
+        <button class="btn danger" id="resetBtn">Reset Event</button>
+      </div>
+    </div>
+    <footer class="note">Keep this host tab open on your device · the voter link works from any phone/laptop on any network.</footer>
+  `;
+
+  document.getElementById('copyLinkBtn').onclick = () => {
+    navigator.clipboard.writeText(link).then(()=>{
+      const b = document.getElementById('copyLinkBtn'); b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy',1500);
+    });
+  };
+  app.querySelectorAll('.song-input').forEach(inp=>{
+    inp.onchange = () => updateSong(parseInt(inp.dataset.round), inp.dataset.field, inp.value);
+  });
+  const openBtn = document.getElementById('openBtn'); if(openBtn) openBtn.onclick = () => openVoting(i);
+  const lockBtn = document.getElementById('lockBtn'); if(lockBtn) lockBtn.onclick = () => lockRound(i);
+  const nextBtn = document.getElementById('nextBtn'); if(nextBtn) nextBtn.onclick = () => nextRound();
+  document.getElementById('resetBtn').onclick = resetEvent;
+}
+
+function renderFinished(){
+  const winner = state.score.peak === state.score.prime ? 'tie' : (state.score.peak > state.score.prime ? 'peak' : 'prime');
+  const confettiEmojis = ['🎉','🎶','🔥','🏆','✨'];
+  let confetti = '';
+  for(let k=0;k<24;k++){
+    confetti += `<div class="confetti" style="left:${Math.random()*100}vw;animation-duration:${3+Math.random()*3}s;animation-delay:${Math.random()*2}s;">${confettiEmojis[k%confettiEmojis.length]}</div>`;
+  }
+  app.innerHTML = `
+    ${confetti}
+    <div class="celebrate">
+      <div class="trophy">🏆</div>
+      <h2>${winner==='tie' ? "It's a tie! 🤝" : `Team ${winner==='peak'?'Peak':'Prime'} takes the crown!`}</h2>
+      <div class="sub" style="color:#cbd5e1;">Final score — Team Peak ${state.score.peak} : ${state.score.prime} Team Prime</div>
+      <div style="margin-top:24px;">${dotsHtml()}</div>
+      ${IS_HOST ? `<div class="btn-row" style="justify-content:center;margin-top:20px;"><button class="btn danger" id="resetBtn2">Reset for a rematch</button></div>` : ''}
+    </div>
+  `;
+  const rb = document.getElementById('resetBtn2'); if(rb) rb.onclick = resetEvent;
+}
+
+function render(){
+  if(!BUCKET){ renderLanding(); return; }
+  if(state.finished){ renderFinished(); return; }
+  if(IS_HOST) renderHost(); else renderVoter();
+}
+
+/* ============ INIT ============ */
+(async function init(){
+  if(BUCKET){
+    await pullState();
+    lastSeen = JSON.stringify(state);
+    startPolling();
+  }
+  render();
+})();
+</script>
+</body>
+</html>
