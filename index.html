@@ -440,10 +440,15 @@ function setVoted(i, team){ localStorage.setItem(votedKey(i), team); }
 
 /* ============ ACTIONS ============ */
 async function castVote(i, team){
-  if(hasVoted(i)) return;
-  setVoted(i, team);
+  const prevTeam = localStorage.getItem(votedKey(i));
+  if(prevTeam === team) return; // already your pick, nothing to do
   await pullState(); // get freshest counts first to reduce collisions
-  if(team === 'peak') state.rounds[i].peakVotes++; else state.rounds[i].primeVotes++;
+  const r = state.rounds[i];
+  if(r.status !== 'open') return; // voting locked — can't change now
+  if(prevTeam === 'peak') r.peakVotes = Math.max(0, r.peakVotes - 1);
+  else if(prevTeam === 'prime') r.primeVotes = Math.max(0, r.primeVotes - 1);
+  if(team === 'peak') r.peakVotes++; else r.primeVotes++;
+  setVoted(i, team);
   render();
   await pushState();
 }
@@ -615,14 +620,14 @@ function renderMatchupCard(i, editable){
 
   let statusLine = '';
   if(r.status==='pending') statusLine = `<div class="status-line">Voting hasn't opened yet</div>`;
-  if(r.status==='open') statusLine = `<div class="status-line open">🟢 Voting is live — cast your vote!</div>`;
+  if(r.status==='open') statusLine = `<div class="status-line open">🟢 Voting is live${voted ? ' — you can change your vote until it\'s locked' : ' — cast your vote!'}</div>`;
   if(r.status==='closed'){
     if(r.winner==='tie') statusLine = `<div class="winner-banner">🤝 It's a tie!</div>`;
     else statusLine = `<div class="winner-banner ${r.winner}">🏆 Team ${r.winner==='peak'?'Peak':'Prime'} wins this round!</div>`;
   }
 
   const showBars = r.status==='open' || r.status==='closed';
-  const canVote = r.status==='open' && !voted;
+  const canVote = r.status==='open';
 
   return `
     <div class="card">
