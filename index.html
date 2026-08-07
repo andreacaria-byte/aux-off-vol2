@@ -66,7 +66,7 @@
 
   .roster{display:flex;align-items:center;justify-content:center;gap:14px;max-width:620px;margin:0 auto 20px;}
   .roster-team{flex:0 0 auto;display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;}
-  .roster-person{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;width:52px;}
+  .roster-person{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;width:52px;position:relative;}
   .roster-person img{
     width:46px;height:46px;border-radius:50%;object-fit:cover;
     border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.2);
@@ -74,6 +74,12 @@
   .roster-team.peak .roster-person img{border-color:var(--peak);}
   .roster-team.prime .roster-person img{border-color:var(--prime);}
   .roster-person .rname{font-size:9.5px;font-weight:700;color:var(--ink);margin-top:3px;text-align:center;line-height:1.1;}
+  .roster-crown{
+    position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-6deg);
+    font-size:16px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25));
+    animation:crownBob 1.4s ease-in-out infinite;
+  }
+  @keyframes crownBob{0%,100%{transform:translateX(-50%) rotate(-6deg) translateY(0);}50%{transform:translateX(-50%) rotate(-6deg) translateY(-2px);}}
   .roster-vs{flex:0 0 auto;font-family:'Racing Sans One';font-size:14px;color:var(--atomic-purple);opacity:.75;}
 
   .dots{display:flex;gap:6px;justify-content:center;margin-bottom:22px;flex-wrap:wrap;}
@@ -325,12 +331,14 @@ const ROSTER = {
 
 function rosterHtml(){
   if(ROSTER.peak.length === 0 && ROSTER.prime.length === 0) return '';
-  const person = p => `<div class="roster-person"><img src="${p.img}" alt="${esc(p.name)}"><div class="rname">${esc(p.name)}</div></div>`;
+  const peakLeads = state.score.peak > state.score.prime;
+  const primeLeads = state.score.prime > state.score.peak;
+  const person = (p, leading) => `<div class="roster-person">${leading ? '<span class="roster-crown">👑</span>' : ''}<img src="${p.img}" alt="${esc(p.name)}"><div class="rname">${esc(p.name)}</div></div>`;
   return `
     <div class="roster">
-      <div class="roster-team peak">${ROSTER.peak.map(person).join('')}</div>
+      <div class="roster-team peak">${ROSTER.peak.map(p=>person(p, peakLeads)).join('')}</div>
       <div class="roster-vs">VS</div>
-      <div class="roster-team prime">${ROSTER.prime.map(person).join('')}</div>
+      <div class="roster-team prime">${ROSTER.prime.map(p=>person(p, primeLeads)).join('')}</div>
     </div>`;
 }
 
@@ -356,6 +364,7 @@ const params = new URLSearchParams(location.search);
 let BUCKET = params.get('bucket') || null;
 let IS_HOST = params.get('host') === '1';
 let syncOk = true;
+let lastSyncOk = true;
 let pollTimer = null;
 let state = defaultState();
 let lastSeen = "";
@@ -381,6 +390,7 @@ async function pushState(){
 }
 async function pullState(){
   if(!BUCKET) return;
+  let changed = false;
   try{
     const res = await fetch(stateUrl(), {cache:'no-store'});
     if(res.ok){
@@ -389,12 +399,18 @@ async function pullState(){
       if(data && txt !== lastSeen){
         lastSeen = txt;
         state = data;
+        changed = true;
       }
       syncOk = true;
     }
   }catch(e){ syncOk = false; }
-  // Don't wipe out a song/artist field mid-keystroke: a background poll would
-  // otherwise re-render the whole page every ~2s and kick you out of the input.
+  // Only re-render if something actually changed (new state from another device,
+  // or the sync-status banner flipping). Re-rendering on every ~2s poll tick
+  // regardless would tear down and rebuild things like the Spotify embed each
+  // time, making it flicker/reload — and it also risks kicking a host out of a
+  // song/artist input mid-keystroke.
+  if(!changed && syncOk === lastSyncOk) return;
+  lastSyncOk = syncOk;
   const active = document.activeElement;
   if(active && active.classList && active.classList.contains('song-input')) return;
   render();
