@@ -125,8 +125,8 @@
   .song-artist{font-size:11.5px;color:rgba(255,255,255,.9);margin-top:2px;min-height:16px;font-weight:600;}
   .placeholder{color:rgba(255,255,255,.7);font-style:italic;}
 
-  .spotify-wrap{margin-top:10px;}
-  .spotify-embed{border-radius:12px;display:block;}
+  .applemusic-wrap{margin-top:10px;}
+  .applemusic-embed{border-radius:12px;display:block;}
 
   .vs-wrap{flex:0 0 auto;width:48px;height:48px;}
   .vs-badge{
@@ -351,8 +351,8 @@ function defaultState(){
       category: r.category,
       desc: r.desc,
       stickers: r.stickers,
-      peakSong: "", peakArtist: "", peakSpotify: "",
-      primeSong: "", primeArtist: "", primeSpotify: "",
+      peakSong: "", peakArtist: "", peakAppleMusic: "",
+      primeSong: "", primeArtist: "", primeAppleMusic: "",
       peakVotes: 0, primeVotes: 0,
       status: "pending" // pending -> open -> closed
     }))
@@ -406,7 +406,7 @@ async function pullState(){
   }catch(e){ syncOk = false; }
   // Only re-render if something actually changed (new state from another device,
   // or the sync-status banner flipping). Re-rendering on every ~2s poll tick
-  // regardless would tear down and rebuild things like the Spotify embed each
+  // regardless would tear down and rebuild things like the Apple Music embed each
   // time, making it flicker/reload — and it also risks kicking a host out of a
   // song/artist input mid-keystroke.
   if(!changed && syncOk === lastSyncOk) return;
@@ -598,12 +598,16 @@ function syncBanner(){
   return syncOk ? '' : `<div class="banner">⚠️ Live sync is having trouble reaching the relay. Votes on this device may not be visible to others until it reconnects.</div>`;
 }
 
-function spotifyEmbedHtml(link){
+function appleMusicEmbedHtml(link){
   if(!link) return '';
-  const m = String(link).match(/track\/([a-zA-Z0-9]+)/);
-  if(!m) return '';
-  const src = `https://open.spotify.com/embed/track/${m[1]}?utm_source=generator&theme=0`;
-  return `<div class="spotify-wrap"><iframe class="spotify-embed" src="${src}" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>`;
+  let s = String(link).trim();
+  if(!/music\.apple\.com/i.test(s)) return '';
+  if(!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  // Apple's embed player is just the normal share link served from a
+  // different subdomain — swap the host and keep the rest of the URL as-is
+  // (album/song slug, id, and ?i= track param all carry over untouched).
+  const src = s.replace(/^https?:\/\/(?:www\.|embed\.)?music\.apple\.com/i, 'https://embed.music.apple.com');
+  return `<div class="applemusic-wrap"><iframe class="applemusic-embed" src="${src}" width="100%" height="175" frameborder="0" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" loading="lazy"></iframe></div>`;
 }
 
 function renderMatchupCard(i, editable){
@@ -641,8 +645,8 @@ function renderMatchupCard(i, editable){
           <span class="team-tag">TEAM PEAK</span>
           ${peakSongHtml}
           ${editable ? `<input placeholder="Artist" value="${esc(r.peakArtist)}" data-field="peakArtist" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
-          ${editable ? `<input placeholder="Spotify song link (optional)" value="${esc(r.peakSpotify)}" data-field="peakSpotify" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
-          ${!editable ? spotifyEmbedHtml(r.peakSpotify) : ''}
+          ${editable ? `<input placeholder="Apple Music song link (optional)" value="${esc(r.peakAppleMusic)}" data-field="peakAppleMusic" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
+          ${!editable ? appleMusicEmbedHtml(r.peakAppleMusic) : ''}
           ${!editable ? `<button class="vote-btn peak" data-round="${i}" data-team="peak" ${canVote?'':'disabled'}>${votedTeam==='peak' ? '✅ Your Vote' : (r.status==='open' ? starIconSvg + 'Vote Peak' : '—')}</button>` : ''}
         </div>
         <div class="vs-wrap"><div class="vs-badge">VS</div></div>
@@ -651,8 +655,8 @@ function renderMatchupCard(i, editable){
           <span class="team-tag">TEAM PRIME</span>
           ${primeSongHtml}
           ${editable ? `<input placeholder="Artist" value="${esc(r.primeArtist)}" data-field="primeArtist" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
-          ${editable ? `<input placeholder="Spotify song link (optional)" value="${esc(r.primeSpotify)}" data-field="primeSpotify" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
-          ${!editable ? spotifyEmbedHtml(r.primeSpotify) : ''}
+          ${editable ? `<input placeholder="Apple Music song link (optional)" value="${esc(r.primeAppleMusic)}" data-field="primeAppleMusic" data-round="${i}" class="song-input" style="margin-top:6px;">` : ''}
+          ${!editable ? appleMusicEmbedHtml(r.primeAppleMusic) : ''}
           ${!editable ? `<button class="vote-btn prime" data-round="${i}" data-team="prime" ${canVote?'':'disabled'}>${votedTeam==='prime' ? '✅ Your Vote' : (r.status==='open' ? starIconSvg + 'Vote Prime' : '—')}</button>` : ''}
         </div>
       </div>
